@@ -1,0 +1,1 @@
+# Defines chromosome, gene range, and fitness evaluation
