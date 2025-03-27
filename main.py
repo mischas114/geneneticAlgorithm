@@ -1,17 +1,26 @@
+import numpy as np
 from ga.utils import load_target_values
+from ga.chromosome import Chromosome  # Import Chromosome class
+
+# This is so the chromosomes are the same across runs
+# because we want to compare the effects of different operators
+np.random.seed(42)
 
 def main():
-    x_vals, y_vals = load_target_values("src/data/target_values.csv")
-    print("Loaded data points:", len(x_vals))
-    print("Sample:", list(zip(x_vals, y_vals))[:5])
+    # Load target values
+    x_vals, y_vals = load_target_values("data/target_values.csv")
 
-# TODO: Load target data from CSV
-# - Use the load_target_values() function
-# - Store x and y (input and expected output)
+    # Initialize population (this will now be deterministic)
+    population_size = 100
+    population = [Chromosome() for _ in range(population_size)]
 
-# TODO: Initialize population
-# - Each chromosome should be a list of 8 real-valued genes [a, b, c, d, e, g, h, i]
-# - Randomly initialize values in range [-10, 10]
+    # Evaluate fitness
+    for chrom in population:
+        chrom.evaluate(x_vals, y_vals)
+
+    # Debug print to verify things are consistent
+    print("First chromosome genes:", population[0].genes)
+    print("First chromosome fitness:", population[0].fitness)
 
 # TODO: Define fitness function
 # - Use evaluate_function(coeffs, x_vals) to compute predicted y
