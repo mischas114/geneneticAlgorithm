@@ -1,0 +1,8 @@
+{
+  "suppression": [
+    {
+      "ruleId": "DS148264",
+      "justification": "Random numbers are used for non-security purposes in genetic algorithm operators."
+    }
+  ]
+}

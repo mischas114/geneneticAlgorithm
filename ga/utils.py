@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 #Load target Data
 def load_target_values(filepath):
@@ -13,17 +14,58 @@ def load_target_values(filepath):
     y = data["y"].values
     return x, y
 
-#Evaluate function
-def evaluate_function(coeffs, x_vals):
-    # Ensure coeffs has exactly 8 values
-    coeffs = coeffs[:8] if len(coeffs) > 8 else coeffs + [0] * (8 - len(coeffs))
-    a, b, c, d, e, g, h, i = coeffs
-    y_pred = [a*x**7 + b*x**6 + c*x**5 + d*x**4 + e*x**3 + g*x**2 + h*x + i for x in x_vals]
-    return y_pred
+import numpy as np
 
+def evaluate_function(genes, x_vals):
+    """
+    f(x) = exp(a) 
+         + b*x 
+         + c*x^2 
+         + d*x^3 
+         + e_coef*x^4 
+         + g*x^5 
+         + h*x^6 
+         + i*x^7
+
+    genes = [a, b, c, d, e_coef, g, h, i]
+    """
+    genes = np.array(genes, dtype=float)
+    # precompute exp(a)
+    const_term = np.exp(genes[0])
+    
+    # build the polynomial part: b*x + c*x^2 + ... + i*x^7
+    # note: genes[1] multiplies x^1, genes[2] multiplies x^2, etc.
+    # we can vectorize via a dot over powers 1..7
+    powers = np.vstack([x_vals**j for j in range(1, len(genes))]).T  # shape (n,7)
+    poly   = powers.dot(genes[1:])  # shape (n,)
+
+    y_pred = const_term + poly
+    
+    # clamp any NaN or inf just in case
+    return np.where(np.isfinite(y_pred), y_pred, 1e10)
+    
 #Mean Squared Error
 def mean_squared_error(y_true, y_pred):
-    return sum((y_true - y_pred)**2) / len(y_true)
+    """
+    Calculate mean squared error with safety checks
+    """
+    try:
+        if len(y_true) != len(y_pred):
+            return 1e10
+            
+        # Replace any NaN or inf values with large numbers
+        y_pred = np.array([y if np.isfinite(y) else 1e10 for y in y_pred])
+        
+        mse = np.mean((np.array(y_true) - y_pred) ** 2)
+        
+        # If MSE is infinite or NaN, return a large value
+        if not np.isfinite(mse):
+            return 1e10
+        
+        return mse
+    except Exception as e:
+        print(f"Error in MSE calculation: {e}")
+        return 1e10
 
 #Save results
 def save_results(filepath, results):

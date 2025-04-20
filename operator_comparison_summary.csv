@@ -1,0 +1,5 @@
+Selection,Crossover,Mutation,Final MSE,Gen<MSE1,Time (s)
+tournament,one_point,swap,8.66890892544969,,1.5444086999996216
+roulette,two_point,scramble,11.077407490942088,,1.846684300000561
+tournament,uniform,inversion,11.829350220460984,,1.5817598000003272
+roulette,uniform,swap,8.128261092058668,,1.8932323999997607
